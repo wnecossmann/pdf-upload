@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF-Upload Tool</title>
+</head>
+<body>
+    <h1>PDF hochladen</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="file" accept="application/pdf" required />
+        <button type="submit">Hochladen</button>
+    </form>
+    <p id="status"></p>
+    <p><a id="download-link" href="#" style="display:none;">ZIP-Datei herunterladen</a></p>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            document.getElementById('status').textContent = "Verarbeitung läuft...";
+            document.getElementById('download-link').style.display = 'none';
+
+            const response = await fetch('/upload/', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                document.getElementById('status').textContent = "Fertig!";
+                const link = document.getElementById('download-link');
+                link.href = result.download_url;
+                link.style.display = 'block';
+            } else {
+                document.getElementById('status').textContent = "Fehler: " + (result.error || "Unbekannter Fehler");
+            }
+        });
+    </script>
+</body>
+</html>
